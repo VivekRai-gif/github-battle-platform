@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+  background-color: rgb(249 250 251);
+  color: rgb(17 24 39);
+}
+
+.dark body {
+  background-color: #0d1117;
+  color: #f0f6fc;
+}
+
+/* Component styles */
+.btn-primary {
+  background-color: rgb(37 99 235);
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: rgb(29 78 216);
+}
+
+.btn-primary:focus {
+  outline: 2px solid rgb(59 130 246);
+  outline-offset: 2px;
+}
+
+.btn-secondary {
+  background-color: rgb(229 231 235);
+  color: rgb(31 41 55);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: rgb(209 213 219);
+}
+
+.card {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  border: 1px solid rgb(229 231 235);
+  padding: 1.5rem;
+}
+
+.dark .card {
+  background-color: #161b22;
+  border-color: #30363d;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgb(209 213 219);
+  border-radius: 0.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: rgb(59 130 246);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+}
+
+.dark .input-field {
+  background-color: #161b22;
+  border-color: #30363d;
+  color: #f0f6fc;
+}
+
+.gradient-text {
+  background: linear-gradient(to right, rgb(37 99 235), rgb(147 51 234));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.winner-glow {
+  box-shadow: 0 0 0 4px rgb(250 204 21 / 0.5), 0 25px 50px -12px rgb(250 204 21 / 0.25);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-item {
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: rgb(249 250 251);
+}
+
+.dark .stat-item {
+  background-color: #0d1117;
+}
+
+/* Utility styles */
+.text-balance {
+  text-wrap: balance;
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background-color: rgb(243 244 246);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgb(209 213 219);
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(156 163 175);
+}
+
+/* Loading animations */
+.loading-dots {
+  display: inline-flex;
+  column-gap: 0.25rem;
+}
+
+.loading-dots div {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: currentColor;
+  border-radius: 9999px;
+  animation: bounce 1s infinite;
+}
+
+.loading-dots div:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.loading-dots div:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.loading-dots div:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+/* Chart container styles */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+}

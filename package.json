@@ -1,0 +1,32 @@
+{
+  "name": "github-battle-platform",
+  "version": "1.0.0",
+  "description": "A web platform for comparing GitHub users' profiles, repositories, and contribution stats",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "start": "cd backend && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "github",
+    "comparison",
+    "developer",
+    "statistics",
+    "leaderboard",
+    "react",
+    "nodejs"
+  ],
+  "author": "GitHub Battle Platform",
+  "license": "MIT"
+}

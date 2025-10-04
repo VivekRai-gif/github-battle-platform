@@ -1,0 +1,11 @@
+# Railway configuration for backend deployment
+[build]
+  command = "npm install"
+  publish = "."
+
+[start]
+  command = "npm start"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "$PORT"
