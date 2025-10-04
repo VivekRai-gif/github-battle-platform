@@ -21,6 +21,20 @@ const WinnerPopup = ({ isOpen, onClose, winner, user1, user2, scoreDifference })
 
   if (!isOpen) return null;
 
+
+  // Safety checks to prevent errors
+  if (!user1 || !user2 || !user1.profile || !user2.profile || !winner) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div className="bg-white dark:bg-github-card rounded-2xl shadow-2xl max-w-2xl w-full max-h-screen overflow-y-auto relative p-8 text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Winner Data Missing</h2>
+          <p className="text-gray-700 dark:text-gray-300 mb-4">Sorry, we couldn't determine the winner due to missing or invalid data. Please try again or check your network/API connection.</p>
+          <button onClick={onClose} className="bg-blue-500 text-white px-4 py-2 rounded">Close</button>
+        </div>
+      </div>
+    );
+  }
+
   const winnerData = winner === user1.profile.username ? user1 : user2;
   const loserData = winner === user1.profile.username ? user2 : user1;
 

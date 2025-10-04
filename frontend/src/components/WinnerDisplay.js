@@ -3,6 +3,11 @@ import { Trophy, Crown, Medal, Zap } from 'lucide-react';
 import SocialShare from './SocialShare';
 
 const WinnerDisplay = ({ winner, user1, user2, scoreDifference }) => {
+  // Safety checks to prevent errors
+  if (!user1 || !user2 || !user1.profile || !user2.profile || !winner) {
+    return null;
+  }
+
   // Since we eliminated ties, we always have a winner
   const winnerData = winner === user1.profile.username ? user1 : user2;
   const loserData = winner === user1.profile.username ? user2 : user1;
@@ -16,7 +21,8 @@ const WinnerDisplay = ({ winner, user1, user2, scoreDifference }) => {
   const WinnerIcon = getWinnerIcon();
 
   const getWinMargin = () => {
-    const percentage = (scoreDifference / loserData.score.total) * 100;
+    const loserScore = loserData?.score?.total || 1; // Prevent division by zero
+    const percentage = (scoreDifference / loserScore) * 100;
     if (percentage > 50) return 'Dominant Victory! 🔥';
     if (percentage > 25) return 'Clear Victory! ⚡';
     if (percentage > 10) return 'Close Victory! 🚀';
@@ -24,7 +30,8 @@ const WinnerDisplay = ({ winner, user1, user2, scoreDifference }) => {
   };
 
   const getVictoryMessage = () => {
-    const percentage = (scoreDifference / loserData.score.total) * 100;
+    const loserScore = loserData?.score?.total || 1; // Prevent division by zero
+    const percentage = (scoreDifference / loserScore) * 100;
     if (percentage > 50) return 'An absolute domination in the coding arena!';
     if (percentage > 25) return 'A commanding performance that leaves no doubt!';
     if (percentage > 10) return 'A solid showing of coding expertise!';

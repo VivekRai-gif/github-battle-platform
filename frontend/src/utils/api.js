@@ -27,7 +27,7 @@ const getApiBaseUrl = () => {
   }
   
   // Development fallback
-  return 'http://localhost:3004/api';
+  return 'http://localhost:5000/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -80,56 +80,120 @@ api.interceptors.response.use(
 );
 
 // API functions
+
 export const compareUsers = async (username1, username2) => {
-  const response = await api.post('/compare', {
-    username1: username1.trim(),
-    username2: username2.trim(),
-  });
-  return response.data;
+  try {
+    const response = await api.post('/compare', {
+      username1: username1.trim(),
+      username2: username2.trim(),
+    });
+    return response.data;
+  } catch (error) {
+    logApiError('POST', '/compare', error);
+    return { error: getApiErrorMessage(error) };
+  }
 };
 
 export const getComparison = async (comparisonId) => {
-  const response = await api.get(`/compare/${comparisonId}`);
-  return response.data;
+  try {
+    const response = await api.get(`/compare/${comparisonId}`);
+    return response.data;
+  } catch (error) {
+    logApiError('GET', `/compare/${comparisonId}`, error);
+    return { error: getApiErrorMessage(error) };
+  }
 };
 
 export const getUserHistory = async (username, limit = 10, offset = 0) => {
-  const response = await api.get(`/compare/user/${username}/history`, {
-    params: { limit, offset },
-  });
-  return response.data;
+  try {
+    const response = await api.get(`/compare/user/${username}/history`, {
+      params: { limit, offset },
+    });
+    return response.data;
+  } catch (error) {
+    logApiError('GET', `/compare/user/${username}/history`, error);
+    return { error: getApiErrorMessage(error) };
+  }
 };
 
 export const getLeaderboard = async (options = {}) => {
   const { limit = 50, period = 'all', sortBy = 'score' } = options;
-  const response = await api.get('/leaderboard', {
-    params: { limit, period, sortBy },
-  });
-  return response.data;
+  try {
+    const response = await api.get('/leaderboard', {
+      params: { limit, period, sortBy },
+    });
+    return response.data;
+  } catch (error) {
+    logApiError('GET', '/leaderboard', error);
+    return { error: getApiErrorMessage(error) };
+  }
 };
 
 export const getUserLeaderboardStats = async (username) => {
-  const response = await api.get(`/leaderboard/user/${username}`);
-  return response.data;
+  try {
+    const response = await api.get(`/leaderboard/user/${username}`);
+    return response.data;
+  } catch (error) {
+    logApiError('GET', `/leaderboard/user/${username}`, error);
+    return { error: getApiErrorMessage(error) };
+  }
 };
 
 export const getTrendingUsers = async (options = {}) => {
   const { limit = 20, period = 'week' } = options;
-  const response = await api.get('/leaderboard/trending', {
-    params: { limit, period },
-  });
-  return response.data;
+  try {
+    const response = await api.get('/leaderboard/trending', {
+      params: { limit, period },
+    });
+    return response.data;
+  } catch (error) {
+    logApiError('GET', '/leaderboard/trending', error);
+    return { error: getApiErrorMessage(error) };
+  }
 };
 
 export const getLeaderboardStats = async () => {
-  const response = await api.get('/leaderboard/stats');
-  return response.data;
+  try {
+    const response = await api.get('/leaderboard/stats');
+    return response.data;
+  } catch (error) {
+    logApiError('GET', '/leaderboard/stats', error);
+    return { error: getApiErrorMessage(error) };
+  }
 };
 
 export const getHealthCheck = async () => {
-  const response = await api.get('/health');
-  return response.data;
+  try {
+    const response = await api.get('/health');
+    return response.data;
+  } catch (error) {
+    logApiError('GET', '/health', error);
+    return { error: getApiErrorMessage(error) };
+  }
 };
+// --- Error Handling Helpers ---
+function logApiError(method, url, error) {
+  if (error.response) {
+    // Server responded with a status code outside 2xx
+    console.error(`[API ERROR] ${method} ${url} - Status: ${error.response.status} - Data:`, error.response.data);
+  } else if (error.request) {
+    // No response received
+    console.error(`[API ERROR] ${method} ${url} - No response received.`, error.request);
+  } else {
+    // Something else happened
+    console.error(`[API ERROR] ${method} ${url} - Error:`, error.message);
+  }
+}
+
+function getApiErrorMessage(error) {
+  if (error.response && error.response.data && error.response.data.error) {
+    return error.response.data.error;
+  }
+  if (error.message) {
+    return error.message;
+  }
+  return 'Unknown error occurred while fetching data.';
+}
 
 // Utility functions
 export const isValidUsername = (username) => {

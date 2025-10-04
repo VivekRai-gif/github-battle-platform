@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Users, Search, RefreshCw, Trophy } from 'lucide-react';
+import { Users } from 'lucide-react';
 import ComparisonForm from '../components/ComparisonForm';
 import ProfileCard from '../components/ProfileCard';
-import WinnerDisplay from '../components/WinnerDisplay';
 import WinnerPopup from '../components/WinnerPopup';
-import ShareButton from '../components/ShareButton';
 import LoadingSpinner from '../components/LoadingSpinner';
+import DebugPanel from '../components/DebugPanel';
 import { compareUsers, getComparison } from '../utils/api';
 
 const Compare = () => {
@@ -33,9 +32,23 @@ const Compare = () => {
     setError(null);
     try {
       const data = await getComparison(id);
+      
+      // Check if the API response has error
+      if (data.error) {
+        setError(data.error);
+        return;
+      }
+      
+      // Validate the response structure
+      if (!data || !data.user1 || !data.user2 || !data.user1.profile || !data.user2.profile) {
+        setError('Invalid comparison data. Please try again.');
+        return;
+      }
+      
       setComparisonData(data);
     } catch (error) {
-      setError(error.message);
+      console.error('Load comparison error:', error);
+      setError('Failed to load comparison. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -57,7 +70,42 @@ const Compare = () => {
     setComparisonData(null);
 
     try {
+      console.log('🔍 Comparing users:', username1, 'vs', username2);
       const data = await compareUsers(username1, username2);
+      
+      console.log('📊 API Response:', data);
+      
+      // Check if the API response has error
+      if (data.error) {
+        console.error('❌ API returned error:', data.error);
+        setError(data.error);
+        return;
+      }
+      
+      // Validate the response structure
+      if (!data || !data.user1 || !data.user2) {
+        console.error('❌ Missing user data:', data);
+        setError('Invalid response from server. User data is missing.');
+        return;
+      }
+      
+      if (!data.user1.profile || !data.user2.profile) {
+        console.error('❌ Missing profile data:', data);
+        setError('Invalid response from server. Profile data is missing.');
+        return;
+      }
+      
+      if (!data.winner) {
+        console.error('❌ No winner determined:', data);
+        setError('Unable to determine winner. Please try again.');
+        return;
+      }
+      
+      console.log('✅ Comparison successful!');
+      console.log('Winner:', data.winner);
+      console.log('User1:', data.user1.profile.username);
+      console.log('User2:', data.user2.profile.username);
+      
       setComparisonData(data);
       
       // Show winner popup after a brief delay for drama
@@ -72,17 +120,11 @@ const Compare = () => {
         `/compare?user1=${encodeURIComponent(username1)}&user2=${encodeURIComponent(username2)}`
       );
     } catch (error) {
-      setError(error.message);
+      console.error('Comparison error:', error);
+      setError('Failed to fetch user data. Please check the usernames and try again.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleReset = () => {
-    setComparisonData(null);
-    setError(null);
-    setInitialUsers({ user1: '', user2: '' });
-    window.history.replaceState(null, '', '/compare');
   };
 
   return (
@@ -115,18 +157,8 @@ const Compare = () => {
       {/* Error Display */}
       {error && (
         <div className="max-w-2xl mx-auto mb-8">
-          <div className="card bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800">
-            <div className="flex items-center space-x-2 text-red-600 dark:text-red-400">
-              <Search className="w-5 h-5" />
-              <span className="font-medium">Error</span>
-            </div>
-            <p className="text-red-600 dark:text-red-400 mt-2">{error}</p>
-            <button
-              onClick={handleReset}
-              className="mt-4 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline"
-            >
-              Try again
-            </button>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
           </div>
         </div>
       )}
@@ -138,69 +170,7 @@ const Compare = () => {
         </div>
       )}
 
-      {/* Comparison Results */}
-      {comparisonData && !loading && (
-        <div className="animate-fade-in">
-          {/* Winner Display */}
-          <WinnerDisplay
-            winner={comparisonData.winner}
-            user1={comparisonData.user1}
-            user2={comparisonData.user2}
-            scoreDifference={comparisonData.scoreDifference}
-          />
 
-          {/* Profile Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <ProfileCard
-              userData={comparisonData.user1}
-              isWinner={comparisonData.winner === comparisonData.user1.profile.username}
-              position="left"
-            />
-            <ProfileCard
-              userData={comparisonData.user2}
-              isWinner={comparisonData.winner === comparisonData.user2.profile.username}
-              position="right"
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <ShareButton
-              comparisonId={comparisonData.comparisonId}
-              user1={comparisonData.user1.profile.username}
-              user2={comparisonData.user2.profile.username}
-            />
-            
-            <button
-              onClick={handleReset}
-              className="btn-secondary flex items-center space-x-2"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>New Comparison</span>
-            </button>
-          </div>
-
-          {/* Comparison Insights */}
-          {comparisonData.insights && comparisonData.insights.length > 0 && (
-            <div className="max-w-4xl mx-auto">
-              <div className="card">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-github-text mb-4 flex items-center">
-                  <Trophy className="w-5 h-5 mr-2" />
-                  Battle Insights
-                </h3>
-                <ul className="space-y-2">
-                  {comparisonData.insights.map((insight, index) => (
-                    <li key={index} className="text-gray-600 dark:text-github-muted flex items-start">
-                      <span className="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      {insight}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Empty State */}
       {!comparisonData && !loading && !error && (
@@ -217,17 +187,31 @@ const Compare = () => {
         </div>
       )}
 
-      {/* Winner Popup */}
-      {comparisonData && (
-        <WinnerPopup
-          isOpen={showWinnerPopup}
-          onClose={() => setShowWinnerPopup(false)}
-          winner={comparisonData.winner}
-          user1={comparisonData.user1}
-          user2={comparisonData.user2}
-          scoreDifference={comparisonData.scoreDifference}
-        />
-      )}
+
+      {/* Winner Popup and Results - bulletproof null checks and fallback UI */}
+      {comparisonData && comparisonData.user1 && comparisonData.user2 && comparisonData.user1.profile && comparisonData.user2.profile && comparisonData.winner ? (
+        <>
+          <div className="flex flex-col md:flex-row gap-8 justify-center items-start mt-8">
+            <ProfileCard user={comparisonData.user1} highlight={comparisonData.winner === 'user1'} />
+            <ProfileCard user={comparisonData.user2} highlight={comparisonData.winner === 'user2'} />
+          </div>
+          <WinnerPopup
+            isOpen={showWinnerPopup}
+            onClose={() => setShowWinnerPopup(false)}
+            winner={comparisonData.winner === 'user1' ? comparisonData.user1 : comparisonData.user2}
+            user1={comparisonData.user1}
+            user2={comparisonData.user2}
+            scoreDifference={comparisonData.scoreDifference}
+          />
+        </>
+      ) : comparisonData ? (
+        <div className="mt-8 text-center text-red-600">
+          <p>Sorry, we couldn't display the results due to missing or invalid data. Please try again.</p>
+        </div>
+      ) : null}
+
+      {/* Debug Panel - only show in development */}
+      {process.env.NODE_ENV === 'development' && <DebugPanel />}
     </div>
   );
 };

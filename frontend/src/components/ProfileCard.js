@@ -1,33 +1,32 @@
 import React from 'react';
-import { Github, MapPin, Building, Calendar, Star, GitFork, Users, Eye, Code, Trophy } from 'lucide-react';
+import { Github, MapPin, Building, Calendar, Star, GitFork, Users, Code, Trophy } from 'lucide-react';
 import { formatNumber, formatDate } from '../utils/api';
 
 const ProfileCard = ({ userData, isWinner, position }) => {
+  // Safety checks to prevent errors
+  if (!userData || !userData.profile) {
+    return (
+      <div className="card opacity-50">
+        <div className="text-center p-8">
+          <div className="text-gray-400">User data not available</div>
+        </div>
+      </div>
+    );
+  }
+
   const { profile, repositories, contributions, score } = userData;
 
-  const getBadgeColor = (type) => {
-    const colors = {
-      'Star Master': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-      'Commit King': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
-      'Influencer': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      'Polyglot': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-      'Team Player': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400',
-      'default': 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-    };
-    return colors[type] || colors.default;
-  };
-
   const stats = [
-    { icon: Users, label: 'Followers', value: formatNumber(profile.followers), color: 'text-blue-600' },
-    { icon: Star, label: 'Total Stars', value: formatNumber(repositories.totalStars), color: 'text-yellow-600' },
-    { icon: GitFork, label: 'Total Forks', value: formatNumber(repositories.totalForks), color: 'text-green-600' },
-    { icon: Code, label: 'Repositories', value: formatNumber(repositories.total), color: 'text-purple-600' },
+    { icon: Users, label: 'Followers', value: formatNumber(profile?.followers || 0), color: 'text-blue-600' },
+    { icon: Star, label: 'Total Stars', value: formatNumber(repositories?.totalStars || 0), color: 'text-yellow-600' },
+    { icon: GitFork, label: 'Total Forks', value: formatNumber(repositories?.totalForks || 0), color: 'text-green-600' },
+    { icon: Code, label: 'Repositories', value: formatNumber(repositories?.total || 0), color: 'text-purple-600' },
   ];
 
   const contributions_stats = [
-    { label: 'Commits', value: formatNumber(contributions.commits), color: 'text-orange-600' },
-    { label: 'Pull Requests', value: formatNumber(contributions.pullRequests), color: 'text-blue-600' },
-    { label: 'Issues', value: formatNumber(contributions.issues), color: 'text-red-600' },
+    { label: 'Commits', value: formatNumber(contributions?.commits || 0), color: 'text-orange-600' },
+    { label: 'Pull Requests', value: formatNumber(contributions?.pullRequests || 0), color: 'text-blue-600' },
+    { label: 'Issues', value: formatNumber(contributions?.issues || 0), color: 'text-red-600' },
     { label: 'Reviews', value: formatNumber(contributions.reviews), color: 'text-green-600' },
   ];
 

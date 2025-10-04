@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Trophy, Crown, Medal, TrendingUp, Users, Calendar, Filter } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Trophy, Crown, Medal, TrendingUp, Users, Filter } from 'lucide-react';
 import { getLeaderboard, getTrendingUsers } from '../utils/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { formatNumber, formatRelativeTime } from '../utils/api';
@@ -31,11 +31,7 @@ const Leaderboard = () => {
     limit: 50
   });
 
-  useEffect(() => {
-    fetchData();
-  }, [filters]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [leaderboardData, trendingData] = await Promise.all([
@@ -49,7 +45,11 @@ const Leaderboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const tabs = [
     { id: 'leaderboard', name: 'Leaderboard', icon: Trophy },
