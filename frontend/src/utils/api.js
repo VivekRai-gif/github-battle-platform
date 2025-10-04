@@ -1,6 +1,36 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3004/api';
+// Smart API URL detection for different deployment scenarios
+const getApiBaseUrl = () => {
+  // Check for environment variable first
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // Production auto-detection
+  if (process.env.NODE_ENV === 'production') {
+    const hostname = window.location.hostname;
+    
+    // Auto-detect based on deployment platform
+    if (hostname.includes('vercel.app')) {
+      return 'https://your-backend-deployment.vercel.app/api';
+    }
+    if (hostname.includes('netlify.app')) {
+      return 'https://your-backend-deployment.netlify.app/api';
+    }
+    if (hostname.includes('railway.app')) {
+      return 'https://your-backend-deployment.railway.app/api';
+    }
+    
+    // Default production API - REPLACE WITH YOUR ACTUAL BACKEND URL
+    return 'https://your-backend-url.com/api';
+  }
+  
+  // Development fallback
+  return 'http://localhost:3004/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Create axios instance with default config
 const api = axios.create({
